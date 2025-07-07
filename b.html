@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقييم الجسم الصحي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-primary: 'Inter', sans-serif;
+            --font-arabic: 'Cairo', sans-serif;
+            --color-primary: #1a1a1a;
+            --color-secondary: #444444;
+            --color-muted: #888888;
+            --color-surface: #ffffff;
+            --color-background: #f7f7f7;
+            --color-accent: #ffc300; /* A vibrant yellow */
+            --color-accent-dark: #e6b000;
+            --color-accent-light: #fff9e6;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        body {
+            font-family: var(--font-arabic);
+            background-color: var(--color-background);
+            color: var(--color-secondary);
+        }
+        html[lang="fr"] body {
+            font-family: var(--font-primary);
+        }
+
+        .main-container {
+            background-color: var(--color-surface);
+            border-radius: 2rem; /* Softer, larger radius */
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #eee;
+        }
+
+        /* Advanced Slider Styles */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--color-accent) 0%, #e0e0e0 0%);
+            border-radius: 3px;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-surface);
+            cursor: pointer;
+            border: 4px solid var(--color-accent);
+            box-shadow: var(--shadow-md);
+            margin-top: -1px; /* Center thumb on track */
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-surface);
+            cursor: pointer;
+            border: 4px solid var(--color-accent);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Input Field Styling */
+        .input-box {
+            background-color: var(--color-background);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .input-box:focus-within {
+             border-color: var(--color-accent);
+             box-shadow: 0 0 0 3px var(--color-accent-light);
+        }
+        
+        /* Summary Card Styling */
+        .summary-card {
+            background-color: var(--color-background);
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .summary-card-active {
+            background-color: var(--color-accent-light);
+            border-color: var(--color-accent);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Details Panel & Gauge */
+        .details-panel {
+             background: linear-gradient(145deg, var(--color-background), #ffffff);
+        }
+        .gauge-bg {
+            background-color: #e9ecef;
+        }
+        .gauge-bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--color-accent);
+        }
+
+        /* Button Styling */
+        .activity-btn {
+            background-color: #e9ecef;
+            color: var(--color-secondary);
+            transition: all 0.2s ease-in-out;
+        }
+        .activity-btn:hover {
+             background-color: #d8dcdf;
+        }
+        .activity-btn-active {
+            background-color: var(--color-accent);
+            color: var(--color-primary);
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+        .gender-btn-active {
+             background-color: var(--color-accent) !important;
+             color: var(--color-primary) !important;
+             box-shadow: var(--shadow-sm);
+        }
+        .lang-btn {
+            color: var(--color-muted);
+        }
+        .lang-btn-active {
+            background-color: var(--color-accent-light);
+            color: var(--color-accent-dark);
+            font-weight: 700;
+        }
+
+        /* Health Insight Panel */
+        .insight-panel {
+            background-color: var(--color-accent-light);
+            border-left: 4px solid var(--color-accent);
+            color: #8c6d00;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="main-container w-full max-w-md mx-auto p-6 md:p-8 space-y-6">
+        
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-extrabold text-primary" data-lang-key="title"></h1>
+            <div>
+                <button id="lang-fr" class="lang-btn px-3 py-1 text-sm rounded-md font-medium">FR</button>
+                <button id="lang-ar" class="lang-btn px-3 py-1 text-sm rounded-md font-medium">AR</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div id="card-bmi" class="summary-card p-3 rounded-xl cursor-pointer">
+                <div class="text-xs font-medium text-muted" data-lang-key="metricBmi"></div>
+                <p id="summary-bmi" class="font-bold text-xl text-primary">0.0</p>
+            </div>
+            <div id="card-bfp" class="summary-card p-3 rounded-xl cursor-pointer">
+                <div class="text-xs font-medium text-muted" data-lang-key="metricBfp"></div>
+                <p id="summary-bfp" class="font-bold text-xl text-primary">0%</p>
+            </div>
+            <div id="card-whtr" class="summary-card p-3 rounded-xl cursor-pointer">
+                <div class="text-xs font-medium text-muted" data-lang-key="metricWhtr"></div>
+                <p id="summary-whtr" class="font-bold text-xl text-primary">0.0</p>
+            </div>
+            <div id="card-calories" class="summary-card p-3 rounded-xl cursor-pointer">
+                <div class="text-xs font-medium text-muted" data-lang-key="metricCalories"></div>
+                <p id="summary-calories" class="font-bold text-xl text-primary">0</p>
+            </div>
+        </div>
+
+        <div id="details-panel" class="details-panel p-5 rounded-2xl space-y-4">
+            <h3 id="details-title" class="font-bold text-primary text-lg"></h3>
+            <div class="text-center">
+                <span id="details-result" class="text-5xl font-extrabold" style="color:var(--color-accent-dark)"></span>
+                <span id="details-unit" class="text-lg text-muted ml-1"></span>
+            </div>
+            <div class="w-full gauge-bg rounded-full h-3">
+                <div id="details-gauge" class="gauge-bar h-3 rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between items-center">
+                <p id="details-category" class="font-semibold text-base"></p>
+                <p id="details-range" class="text-xs text-muted"></p>
+            </div>
+        </div>
+
+        <div id="activity-panel" class="hidden space-y-3">
+            <label class="text-sm font-medium text-secondary" data-lang-key="activityLevel"></label>
+            <div class="grid grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
+                <button data-value="1.2" class="activity-btn py-2 px-1 rounded-md" data-lang-key="sedentary"></button>
+                <button data-value="1.375" class="activity-btn py-2 px-1 rounded-md" data-lang-key="light"></button>
+                <button data-value="1.55" class="activity-btn py-2 px-1 rounded-md" data-lang-key="moderate"></button>
+                <button data-value="1.725" class="activity-btn py-2 px-1 rounded-md" data-lang-key="active"></button>
+                <button data-value="1.9" class="activity-btn py-2 px-1 rounded-md" data-lang-key="veryActive"></button>
+            </div>
+        </div>
+        
+        <div class="insight-panel p-4 rounded-lg">
+             <p id="health-insight" class="text-sm font-medium"></p>
+        </div>
+
+        <div class="space-y-6 pt-2">
+            <div class="grid grid-cols-2 gap-4">
+                 <div class="input-box p-3 rounded-xl">
+                    <label class="text-xs font-medium text-muted" data-lang-key="age"></label>
+                    <input type="number" id="age-input" value="30" class="w-full bg-transparent text-xl font-bold text-primary focus:outline-none text-left" dir="ltr">
+                </div>
+                 <div class="input-box p-3 rounded-xl">
+                    <label class="text-xs font-medium text-muted" data-lang-key="gender"></label>
+                    <div class="flex items-center space-x-1 rtl:space-x-reverse mt-2">
+                        <button id="gender-male" class="w-full py-1.5 rounded-md text-sm font-semibold activity-btn" data-lang-key="male"></button>
+                        <button id="gender-female" class="w-full py-1.5 rounded-md text-sm font-semibold activity-btn" data-lang-key="female"></button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="font-medium text-secondary" data-lang-key="height"></label>
+                    <div class="input-box rounded-lg px-3 py-1 flex items-baseline">
+                        <input type="number" id="height-number" value="170" class="w-16 text-lg font-bold text-primary bg-transparent focus:outline-none text-center" dir="ltr">
+                        <span class="text-sm text-muted" data-lang-key="unitCm"></span>
+                    </div>
+                </div>
+                <input type="range" id="height-range" min="120" max="220" value="170" class="w-full">
+            </div>
+            <div>
+                 <div class="flex justify-between items-center mb-2">
+                    <label class="font-medium text-secondary" data-lang-key="weight"></label>
+                     <div class="input-box rounded-lg px-3 py-1 flex items-baseline">
+                        <input type="number" id="weight-number" value="70" class="w-16 text-lg font-bold text-primary bg-transparent focus:outline-none text-center" dir="ltr">
+                        <span class="text-sm text-muted" data-lang-key="unitKg"></span>
+                    </div>
+                </div>
+                <input type="range" id="weight-range" min="30" max="150" value="70" class="w-full">
+            </div>
+             <div>
+                 <div class="flex justify-between items-center mb-2">
+                    <label class="font-medium text-secondary" data-lang-key="waist"></label>
+                     <div class="input-box rounded-lg px-3 py-1 flex items-baseline">
+                        <input type="number" id="waist-number" value="80" class="w-16 text-lg font-bold text-primary bg-transparent focus:outline-none text-center" dir="ltr">
+                        <span class="text-sm text-muted" data-lang-key="unitCm"></span>
+                    </div>
+                </div>
+                <input type="range" id="waist-range" min="50" max="150" value="80" class="w-full">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            fr: {
+                title: "Bilan Corporel", age: "Âge", gender: "Sexe", male: "Homme", female: "Femme",
+                height: "Taille", weight: "Poids", waist: "Tour de taille", unitCm: "cm", unitKg: "kg", unitKcal: "kcal",
+                metricBmi: "IMC", metricBfp: "% Gras", metricWhtr: "Taille/Taille", metricCalories: "Calories",
+                activityLevel: "Niveau d'activité", sedentary: "Sédentaire", light: "Léger", moderate: "Modéré", active: "Actif", veryActive: "Très Actif",
+                bmi: { title: "Indice de Masse Corporelle", underweight: "Poids insuffisant", normal: "Normal", overweight: "Surpoids", obese: "Obèse", range: "Sain: 18.5 - 24.9" },
+                bfp: { title: "Masse Grasse (Est.)", athletic: "Athlétique", fitness: "En Forme", acceptable: "Acceptable", obese: "Obèse", rangeMale: "Sain: 14% - 17%", rangeFemale: "Sain: 21% - 24%" },
+                whtr: { title: "Rapport Taille/Hauteur", healthy: "Sain", overweight: "Surpoids", highRisk: "Risque Élevé", veryHighRisk: "Risque Très Élevé", range: "Sain: < 0.5" },
+                calories: { title: "Besoins Journaliers (TDEE)", bmrText: "Votre métabolisme de base (BMR) est de {bmr} kcal." },
+                insights: {
+                    mainRiskWhtr: "Votre rapport taille/hauteur est élevé, indiquant un risque accru pour la santé. La priorité est de réduire le tour de taille.",
+                    mainRiskBfp: "Votre pourcentage de graisse corporelle est élevé. Visez une alimentation équilibrée et de l'exercice.",
+                    mainRiskBmi: "Votre IMC est dans la catégorie à risque. Consultez un professionnel pour un plan personnalisé.",
+                    child: "Pour les moins de 20 ans, les résultats doivent être interprétés par un professionnel de la santé.",
+                    goodJob: "Excellent ! Tous vos indicateurs clés sont dans la zone saine. Continuez comme ça !",
+                    default: "Utilisez ces estimations comme un guide. Consultez un professionnel pour des conseils personnalisés."
+                }
+            },
+            ar: {
+                title: "تقييم الجسم الصحي", age: "العمر", gender: "الجنس", male: "ذكر", female: "أنثى",
+                height: "الطول", weight: "الوزن", waist: "محيط الخصر", unitCm: "سم", unitKg: "كجم", unitKcal: "سعرة",
+                metricBmi: "كتلة الجسم", metricBfp: "% دهون", metricWhtr: "الخصر/الطول", metricCalories: "السعرات",
+                activityLevel: "مستوى النشاط", sedentary: "خامل", light: "خفيف", moderate: "معتدل", active: "نشيط", veryActive: "نشيط جدا",
+                bmi: { title: "مؤشر كتلة الجسم", underweight: "نقص الوزن", normal: "طبيعي", overweight: "زيادة الوزن", obese: "سمنة", range: "النطاق الصحي: 18.5 - 24.9" },
+                bfp: { title: "دهون الجسم (تقديري)", athletic: "رياضي", fitness: "لياقة", acceptable: "مقبول", obese: "سمنة", rangeMale: "صحي: 14% - 17%", rangeFemale: "صحي: 21% - 24%" },
+                whtr: { title: "نسبة الخصر إلى الطول", healthy: "صحي", overweight: "زيادة وزن", highRisk: "خطورة عالية", veryHighRisk: "خطورة عالية جداً", range: "النطاق الصحي: < 0.5" },
+                calories: { title: "الاحتياج اليومي (TDEE)", bmrText: "معدل الأيض الأساسي (BMR) هو {bmr} سعرة حرارية." },
+                insights: {
+                    mainRiskWhtr: "نسبة الخصر إلى الطول مرتفعة، مما يزيد من المخاطر الصحية. الأولوية هي تقليل محيط الخصر.",
+                    mainRiskBfp: "نسبة الدهون في الجسم مرتفعة. استهدف نظامًا غذائيًا متوازنًا وممارسة الرياضة.",
+                    mainRiskBmi: "مؤشر كتلة الجسم في فئة خطرة. استشر مختصًا لوضع خطة شخصية.",
+                    child: "لمن هم أقل من 20 عامًا، يجب تفسير النتائج من قبل أخصائي رعاية صحية.",
+                    goodJob: "ممتاز! جميع مؤشراتك الرئيسية في النطاق الصحي. استمر في هذا النهج.",
+                    default: "استخدم هذه التقديرات كدليل. استشر مختصًا للحصول على نصائح شخصية."
+                }
+            }
+        };
+
+        const elements = {
+            htmlEl: document.documentElement,
+            langFrBtn: document.getElementById('lang-fr'), langArBtn: document.getElementById('lang-ar'),
+            ageInput: document.getElementById('age-input'), genderMaleBtn: document.getElementById('gender-male'), genderFemaleBtn: document.getElementById('gender-female'),
+            heightNumber: document.getElementById('height-number'), heightRange: document.getElementById('height-range'),
+            weightNumber: document.getElementById('weight-number'), weightRange: document.getElementById('weight-range'),
+            waistNumber: document.getElementById('waist-number'), waistRange: document.getElementById('waist-range'),
+            summary: { bmi: document.getElementById('summary-bmi'), bfp: document.getElementById('summary-bfp'), whtr: document.getElementById('summary-whtr'), calories: document.getElementById('summary-calories') },
+            cards: { bmi: document.getElementById('card-bmi'), bfp: document.getElementById('card-bfp'), whtr: document.getElementById('card-whtr'), calories: document.getElementById('card-calories') },
+            details: { panel: document.getElementById('details-panel'), title: document.getElementById('details-title'), result: document.getElementById('details-result'), unit: document.getElementById('details-unit'), gauge: document.getElementById('details-gauge'), category: document.getElementById('details-category'), range: document.getElementById('details-range') },
+            activity: { panel: document.getElementById('activity-panel'), buttons: document.querySelectorAll('#activity-panel button') },
+            healthInsight: document.getElementById('health-insight')
+        };
+
+        let state = { lang: 'ar', age: 30, gender: 'male', height: 170, weight: 70, waist: 80, activity: 1.55, activeMetric: 'bmi' };
+
+        function calculateHealthMetrics() {
+            const { height, weight, age, gender, waist, activity } = state;
+            if (height === 0 || weight === 0) return {};
+            const heightM = height / 100;
+            const bmi = weight / (heightM * heightM);
+            const bmr = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'male' ? 5 : -161);
+            const tdee = bmr * activity;
+            const bfp = (1.20 * bmi) + (0.23 * age) - (10.8 * (gender === 'male' ? 1 : 0)) - 5.4;
+            const whtr = waist > 0 ? waist / height : 0;
+            return { bmi, bfp, whtr, bmr, tdee };
+        }
+        
+        function updateRangeBackground(el) {
+            const min = el.min || 0;
+            const max = el.max || 100;
+            const value = el.value || 0;
+            const percent = ((value - min) / (max - min)) * 100;
+            el.style.background = `linear-gradient(90deg, var(--color-accent) ${percent}%, #e0e0e0 ${percent}%)`;
+        }
+
+        function render() {
+            const metrics = calculateHealthMetrics();
+            if (Object.keys(metrics).length === 0) return;
+            
+            const tr = translations[state.lang];
+
+            elements.summary.bmi.textContent = metrics.bmi.toFixed(1);
+            elements.summary.bfp.textContent = `${metrics.bfp.toFixed(1)}%`;
+            elements.summary.whtr.textContent = metrics.whtr.toFixed(2);
+            elements.summary.calories.textContent = Math.round(metrics.tdee);
+
+            Object.values(elements.cards).forEach(c => c.classList.remove('summary-card-active'));
+            elements.cards[state.activeMetric].classList.add('summary-card-active');
+
+            elements.activity.panel.style.display = state.activeMetric === 'calories' ? 'block' : 'none';
+
+            renderDetails(metrics, tr);
+            renderInsight(metrics, tr);
+            
+            ['height', 'weight', 'waist'].forEach(key => updateRangeBackground(elements[`${key}Range`]));
+        }
+
+        function renderDetails(metrics, tr) {
+            const { details } = elements;
+            let info, value, unit = '', rangeText, gaugePercent;
+            const colors = {
+                blue: '#3b82f6', green: '#22c55e', yellow: '#eab308', red: '#ef4444', indigo: '#6366f1'
+            };
+
+            switch (state.activeMetric) {
+                case 'bmi':
+                    info = getCategoryInfo(metrics.bmi, 'bmi', state.age);
+                    value = metrics.bmi.toFixed(1);
+                    rangeText = tr.bmi.range;
+                    gaugePercent = (metrics.bmi - 15) / (35 - 15) * 100;
+                    details.title.textContent = tr.bmi.title;
+                    break;
+                case 'bfp':
+                    info = getCategoryInfo(metrics.bfp, 'bfp', state.gender);
+                    value = metrics.bfp.toFixed(1);
+                    unit = '%';
+                    rangeText = state.gender === 'male' ? tr.bfp.rangeMale : tr.bfp.rangeFemale;
+                    gaugePercent = (metrics.bfp) / 50 * 100;
+                    details.title.textContent = tr.bfp.title;
+                    break;
+                case 'whtr':
+                    info = getCategoryInfo(metrics.whtr, 'whtr');
+                    value = metrics.whtr.toFixed(2);
+                    rangeText = tr.whtr.range;
+                    gaugePercent = metrics.whtr / 0.7 * 100;
+                    details.title.textContent = tr.whtr.title;
+                    break;
+                case 'calories':
+                    info = { category: '', color: 'indigo' };
+                    value = Math.round(metrics.tdee);
+                    unit = tr.unitKcal;
+                    rangeText = tr.calories.bmrText.replace('{bmr}', Math.round(metrics.bmr));
+                    gaugePercent = 0; // No gauge for calories
+                    details.title.textContent = tr.calories.title;
+                    break;
+            }
+
+            details.result.textContent = value;
+            details.unit.textContent = unit;
+            details.category.textContent = info.category;
+            details.category.style.color = colors[info.color] || 'var(--color-primary)';
+            details.range.textContent = rangeText;
+            details.gauge.style.background = `var(--color-accent)`;
+            details.gauge.style.width = `${Math.max(0, Math.min(100, gaugePercent))}%`;
+        }
+        
+        function renderInsight(metrics, tr) {
+            const whtrInfo = getCategoryInfo(metrics.whtr, 'whtr');
+            const bfpInfo = getCategoryInfo(metrics.bfp, 'bfp', state.gender);
+            const bmiInfo = getCategoryInfo(metrics.bmi, 'bmi', state.age);
+            
+            if (state.age < 20) {
+                elements.healthInsight.textContent = tr.insights.child;
+            } else if (whtrInfo.isRisk) {
+                elements.healthInsight.textContent = tr.insights.mainRiskWhtr;
+            } else if (bfpInfo.isRisk) {
+                elements.healthInsight.textContent = tr.insights.mainRiskBfp;
+            } else if (bmiInfo.isRisk) {
+                elements.healthInsight.textContent = tr.insights.mainRiskBmi;
+            } else if (!whtrInfo.isRisk && !bfpInfo.isRisk && !bmiInfo.isRisk) {
+                 elements.healthInsight.textContent = tr.insights.goodJob;
+            } else {
+                elements.healthInsight.textContent = tr.insights.default;
+            }
+        }
+
+        function getCategoryInfo(value, type, context) {
+            switch (type) {
+                case 'bmi':
+                    const normalUpper = context >= 65 ? 27 : 25;
+                    if (value < 18.5) return { category: translations[state.lang].bmi.underweight, color: 'blue', isRisk: true };
+                    if (value < normalUpper) return { category: translations[state.lang].bmi.normal, color: 'green' };
+                    if (value < 30) return { category: translations[state.lang].bmi.overweight, color: 'yellow', isRisk: true };
+                    return { category: translations[state.lang].bmi.obese, color: 'red', isRisk: true };
+                case 'bfp':
+                    const ranges = context === 'male' ? [14, 18, 25] : [21, 25, 32];
+                    if (value < ranges[0]) return { category: translations[state.lang].bfp.athletic, color: 'blue' };
+                    if (value < ranges[1]) return { category: translations[state.lang].bfp.fitness, color: 'green' };
+                    if (value < ranges[2]) return { category: translations[state.lang].bfp.acceptable, color: 'yellow' };
+                    return { category: translations[state.lang].bfp.obese, color: 'red', isRisk: true };
+                case 'whtr':
+                    if (value < 0.5) return { category: translations[state.lang].whtr.healthy, color: 'green' };
+                    if (value < 0.6) return { category: translations[state.lang].whtr.overweight, color: 'yellow', isRisk: true };
+                    return { category: translations[state.lang].whtr.highRisk, color: 'red', isRisk: true };
+            }
+        }
+
+        function setLanguage(lang) {
+            state.lang = lang;
+            elements.htmlEl.lang = lang;
+            elements.htmlEl.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            const isAr = lang === 'ar';
+            elements.langArBtn.classList.toggle('lang-btn-active', isAr);
+            elements.langFrBtn.classList.toggle('lang-btn-active', !isAr);
+            
+            document.querySelectorAll('[data-lang-key]').forEach(el => {
+                const key = el.dataset.langKey;
+                const translation = key.split('.').reduce((o, i) => o[i], translations[lang]);
+                if (translation) el.textContent = translation;
+            });
+            render();
+        }
+
+        function initEventListeners() {
+            const syncInputs = (source, target, key) => {
+                const value = parseFloat(source.value) || 0;
+                if (target.value != value) target.value = value;
+                state[key] = value;
+                if(source.type === 'range') {
+                    updateRangeBackground(source);
+                }
+                render();
+            };
+            
+            ['height', 'weight', 'waist'].forEach(key => {
+                const rangeEl = elements[`${key}Range`];
+                const numberEl = elements[`${key}Number`];
+                rangeEl.addEventListener('input', () => syncInputs(rangeEl, numberEl, key));
+                numberEl.addEventListener('input', () => syncInputs(numberEl, rangeEl, key));
+            });
+            
+            elements.ageInput.addEventListener('input', e => { state.age = parseInt(e.target.value) || 0; render(); });
+            
+            const setGender = (gender) => {
+                state.gender = gender;
+                elements.genderMaleBtn.classList.toggle('gender-btn-active', gender === 'male');
+                elements.genderFemaleBtn.classList.toggle('gender-btn-active', gender !== 'male');
+                render();
+            };
+            elements.genderMaleBtn.addEventListener('click', () => setGender('male'));
+            elements.genderFemaleBtn.addEventListener('click', () => setGender('female'));
+
+            Object.keys(elements.cards).forEach(key => {
+                elements.cards[key].addEventListener('click', () => { state.activeMetric = key; render(); });
+            });
+
+            elements.activity.buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    elements.activity.buttons.forEach(b => b.classList.remove('activity-btn-active'));
+                    btn.classList.add('activity-btn-active');
+                    state.activity = parseFloat(btn.dataset.value);
+                    render();
+                });
+            });
+
+            elements.langFrBtn.addEventListener('click', () => setLanguage('fr'));
+            elements.langArBtn.addEventListener('click', () => setLanguage('ar'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initEventListeners();
+            setLanguage('ar'); 
+            // Set initial active buttons based on state
+            document.querySelector(`#activity-panel button[data-value="${state.activity}"]`).classList.add('activity-btn-active');
+            elements.genderMaleBtn.classList.add('gender-btn-active');
+            render(); 
+        });
+    </script>
+</body>
+</html>
